@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
-from sklearn.linear_model import LinearRegression
+from database import load_data
+from model import train_model
 
-# Page Config
+# Page Configuration
 st.set_page_config(
     page_title="AI-Powered Student Analytics System",
     page_icon="🎓",
@@ -15,7 +15,7 @@ st.title("🎓 AI-Powered Student Analytics System")
 st.markdown("### Student Performance Prediction using Machine Learning")
 
 # Sidebar
-st.sidebar.header("About Project")
+st.sidebar.header("📌 About Project")
 
 st.sidebar.info("""
 This project predicts student marks using:
@@ -28,25 +28,18 @@ Technologies Used:
 - Pandas
 - Streamlit
 - Scikit-learn
+- GitHub
 """)
 
-# Sample Dataset
-data = {
-    "Student": ["Aman", "Rahul", "Sneha", "Priya", "Kiran"],
-    "Attendance": [85, 90, 70, 60, 95],
-    "StudyHours": [4, 5, 2, 1, 6],
-    "Marks": [80, 90, 65, 50, 95]
-}
-
-# Create DataFrame
-df = pd.DataFrame(data)
+# Load Dataset from CSV
+df = load_data()
 
 # Dataset Section
 st.subheader("📊 Student Dataset")
 
 st.dataframe(df)
 
-# Statistics
+# Dataset Statistics
 st.subheader("📈 Dataset Statistics")
 
 col1, col2, col3 = st.columns(3)
@@ -69,7 +62,7 @@ st.subheader("📉 Attendance Analysis")
 
 st.line_chart(df.set_index("Student")["Attendance"])
 
-# Correlation Section
+# Scatter Chart
 st.subheader("🔍 Relationship Between Attendance and Marks")
 
 chart_data = pd.DataFrame({
@@ -79,24 +72,34 @@ chart_data = pd.DataFrame({
 
 st.scatter_chart(chart_data)
 
-# Machine Learning Model
+# Machine Learning Section
 X = df[["Attendance", "StudyHours"]]
 y = df["Marks"]
 
-model = LinearRegression()
-model.fit(X, y)
+# Train Model using model.py
+model = train_model(X, y)
 
 # Prediction Section
 st.subheader("🤖 Predict Student Performance")
 
-attendance = st.slider("Attendance Percentage", 0, 100, 80)
+attendance = st.slider(
+    "Attendance Percentage",
+    0,
+    100,
+    80
+)
 
-hours = st.slider("Study Hours Per Day", 0, 10, 4)
+hours = st.slider(
+    "Study Hours Per Day",
+    0,
+    10,
+    4
+)
 
-# Predict
+# Prediction
 prediction = model.predict([[attendance, hours]])
 
-# Prediction Output
+# Prediction Result
 st.success(f"🎯 Predicted Marks: {prediction[0]:.2f}")
 
 # Performance Category
@@ -109,17 +112,23 @@ elif prediction[0] >= 70:
 else:
     st.warning("⚠️ Performance: Needs Improvement")
 
-# Tips Section
+# AI Suggestions
 st.subheader("💡 AI Suggestions")
 
 if attendance < 75:
-    st.warning("Increase attendance to improve academic performance.")
+    st.warning(
+        "Increase attendance to improve academic performance."
+    )
 
 if hours < 3:
-    st.warning("Increase daily study hours for better marks.")
+    st.warning(
+        "Increase daily study hours for better marks."
+    )
 
 if attendance >= 85 and hours >= 5:
-    st.success("Excellent academic consistency detected!")
+    st.success(
+        "Excellent academic consistency detected!"
+    )
 
 # Footer
 st.markdown("---")
